@@ -53,22 +53,21 @@ int main(void){
     
     game gB(v.size()); // construct new game board
     gB.initBoard(v);
-    printBoard(v);
+    // printBoard(v);
     bool ans = false;
 	int bound = 0, gx = 0;
 	while (!ans && bound <= 100)
 		bound = IDAstar(gB, v, gx, bound, ans);
 
-    printf("Ans: ");
+    // Calculating total time taken by the program.
+    auto done = std::chrono::high_resolution_clock::now();
+    std::cout << "Total run time = " << std::fixed << std::chrono::duration_cast<std::chrono::milliseconds>(done-started).count()/1000.0 << std::setprecision(5);
+    std::cout << " seconds." << "\n";
+    printf("An optimal solution has %d moves:\n", gx);
     for(int idx=0;idx<gx;++idx){
         printf("%d ", solution[idx]+1);
     }
     printf("\n");
-
-    // Calculating total time taken by the program.
-    auto done = std::chrono::high_resolution_clock::now();
-    std::cout << "Time taken by program is : " << std::fixed << std::chrono::duration_cast<std::chrono::milliseconds>(done-started).count()/1000.0 << std::setprecision(5);
-    std::cout << " sec " << "\n";
 
     return 0;
 }
