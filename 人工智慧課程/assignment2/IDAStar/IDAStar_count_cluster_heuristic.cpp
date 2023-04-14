@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
+#include <chrono>
 #include "basic.h"
 #include "game.h"
 #include "board.h"
@@ -63,8 +64,7 @@ int IDAstar(game gB, std::vector<int> v, int& gx, int& bound, bool& ans){
 	return nextBound;
 }
 int main(void){
-    time_t start, end;
-    time(&start);
+    auto started = std::chrono::high_resolution_clock::now();
 
     std::vector<int> v;
     v = initBoard(); // take the initial testcase of the game board
@@ -85,11 +85,9 @@ int main(void){
     }
     printf("\n");
 
-    time(&end);
-
     // Calculating total time taken by the program.
-    double time_taken = double(end - start);
-    std::cout << "Time taken by program is : " << std::fixed << time_taken << std::setprecision(5);
+    auto done = std::chrono::high_resolution_clock::now();
+    std::cout << "Time taken by program is : " << std::fixed << std::chrono::duration_cast<std::chrono::milliseconds>(done-started).count()/1000.0 << std::setprecision(5);
     std::cout << " sec " << "\n";
     return 0;
 }
