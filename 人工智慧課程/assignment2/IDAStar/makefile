@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -O2 -Wall -Wextra -std=c++17
-OBJS = main.o basic.o board.o game.o
+OBJS = main.o ../gameLib/basic.o ../gameLib/board.o ../gameLib/game.o
 EXE = main
 
 all: $(OBJS)
