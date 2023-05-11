@@ -17,6 +17,9 @@ int main(void){
     printBoard(v, x, y); // print the initial testcase of the game board
     // start to write code here ...
 
+    game gB(x,y); // construct new game board
+    gB.initBoard(v, x, y); // initialize the game board
+    gB.printBoard();
     return 0;
 }
 
