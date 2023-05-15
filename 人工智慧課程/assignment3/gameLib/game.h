@@ -32,6 +32,10 @@ class game{
         void updatePlayerScore(int score, bool isPlayer1);
         void printPlayerScore();
         void printFinalScore();
+        void setplayer1Score(int score);
+        void setplayer2Score(int score);
+        int getPlayer1Score() const;
+        int getPlayer2Score() const;
 };
     
 #endif

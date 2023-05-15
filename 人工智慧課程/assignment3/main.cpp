@@ -3,45 +3,53 @@
 #include <iostream>
 #include <iomanip>
 #include <chrono>
+#include <algorithm>
 #include "./gameLib/basic.h"
 #include "./gameLib/game.h"
 #include "./gameLib/board.h"
 
 int selectPosI = 1;
-struct Node {
-    int val;
-    int eVal;
-    std::vector<Node *> child;
-};
-Node *newNode(int val, int eVal){
-    Node * node = new Node;
-    node->val = val;
-    node->eVal = eVal;
-    return node;
+bool sortByFir(const std::pair<int,int> &a,const std::pair<int,int> &b){
+    return (a.first > b.first);
 }
 
-// Evaluate function is first person get score minus second person get score
-int getEvalFunctionVal(Node *currentNode, Node *parentNode, bool isMax){
-    if(isMax){
-        return parentNode->eVal + currentNode->val;
-    }
-    else{
-        return parentNode->eVal - currentNode->val;
-    }
-}
 // choosePoint::ROW and choosePoint::COLUMN are son of the node
 // in one choose, we need to choose one of the row or column point
 // use first person get score minus second person get score as evaluation function
-int AlphaBetaPruing(game gB, std::vector<std::vector<int>> v, int alpha, int beta, bool isMax, int depth, Node *parentNode, bool currentPlayer) {
+int AlphaBetaPruing(game gB, std::vector<std::vector<int>> v, int alpha, int beta, bool isMax, int depth, bool currentPlayer) {
     // board clean then return
     if(gB.isBoardClean()){
-        return 0;
+        return gB.getPlayer1Score() - gB.getPlayer2Score();
     }
     int len = gB.getN() + gB.getM();
+    // printf("isMax = %d\n", isMax);
     // printf("len = %d\n", len);
     if(isMax){
         int maxVal = -1000000;
+        std::pair<int,int> arr[len]; // first val, second index
         for(int i=1; i<=len; i++){
+            if(i<=gB.getN()){ // choosePoint::ROW
+                int currentScore = gB.getCurrentRowOrColumnSum(choosePoint::ROW, i);
+                arr[i-1] = std::make_pair(currentScore, i);
+                if(currentScore == 0){
+                    continue;
+                }
+            }
+            else{ // choosePoint::COLUMN
+                int currentScore = gB.getCurrentRowOrColumnSum(choosePoint::COLUMN, i-gB.getN());
+                arr[i-1] = std::make_pair(currentScore, i);
+                if(currentScore == 0){
+                    continue;
+                }
+            }
+        }
+        std::sort(arr, arr+len, sortByFir);
+        // for(int i=1; i<=len; i++){
+        for(int j=1; j<=len; j++){
+            int i = arr[j-1].second;
+            if (i == 0){
+                continue;
+            }
             // printf("HI\n");
             if(i<=gB.getN()){ // choosePoint::ROW
                 int currentScore = gB.getCurrentRowOrColumnSum(choosePoint::ROW, i);
@@ -50,23 +58,23 @@ int AlphaBetaPruing(game gB, std::vector<std::vector<int>> v, int alpha, int bet
                 }
                 game tmpGB = gB;
                 tmpGB.getOneStepVal(choosePoint::ROW, i);
-                Node *currentNode = newNode(currentScore, 0);
-                currentNode->eVal = getEvalFunctionVal(currentNode, parentNode, isMax);
-                // printf("i = %d currentNode->eVal = %d depth = %d\n", i, currentNode->eVal, depth);
-                int val = AlphaBetaPruing(tmpGB, v, alpha, beta, false, depth+1, currentNode, currentPlayer);
-                if(depth == 0 && currentNode->eVal >= maxVal){
-                    maxVal = currentNode->eVal;
+                
+                tmpGB.setplayer1Score(currentScore);
+                // printf("i = %d currentEVal = %d depth = %d\n", i, currentEVal, depth);
+                int val = AlphaBetaPruing(tmpGB, v, alpha, beta, false, depth-1, currentPlayer);
+                if(depth == 16 && val >= maxVal){
+                    maxVal = val;
                     selectPosI = i;
                 }
                 else{
-                    maxVal = std::max(maxVal, currentNode->eVal);
+                    maxVal = std::max(maxVal, val);
                 }
-                alpha = std::max(alpha, currentNode->eVal);
+                alpha = std::max(alpha, maxVal);
                 if(beta <= alpha){
                     // printf("max Prune\n");
                     break;
                 }
-                // printf("i = %d currentNode->eVal = %d\n", i, currentNode->eVal);
+                // printf("i = %d currentEVal = %d\n", i, currentEVal);
             }
             else{ // choosePoint::COLUMN
                 int currentScore = gB.getCurrentRowOrColumnSum(choosePoint::COLUMN, i-gB.getN());
@@ -75,23 +83,23 @@ int AlphaBetaPruing(game gB, std::vector<std::vector<int>> v, int alpha, int bet
                 }
                 game tmpGB = gB;
                 tmpGB.getOneStepVal(choosePoint::COLUMN, i-gB.getN());
-                Node *currentNode = newNode(currentScore, 0);
-                currentNode->eVal = getEvalFunctionVal(currentNode, parentNode, isMax);
-                // printf("i = %d currentNode->eVal = %d depth = %d\n", i, currentNode->eVal, depth);
-                int val = AlphaBetaPruing(tmpGB, v, alpha, beta, false, depth+1, currentNode, currentPlayer);
-                if(depth == 0 && currentNode->eVal >= maxVal){
-                    maxVal = currentNode->eVal;
+                
+                tmpGB.setplayer1Score(currentScore);
+                // printf("i = %d currentEVal = %d depth = %d\n", i, currentEVal, depth);
+                int val = AlphaBetaPruing(tmpGB, v, alpha, beta, false, depth-1, currentPlayer);
+                if(depth == 16 && val >= maxVal){
+                    maxVal = val;
                     selectPosI = i;
                 }
                 else{
-                    maxVal = std::max(maxVal, currentNode->eVal);
+                    maxVal = std::max(maxVal, val);
                 }
-                alpha = std::max(alpha, currentNode->eVal);
+                alpha = std::max(alpha, maxVal);
                 if(beta <= alpha){
                     // printf("max Prune\n");
                     break;
                 }
-                // printf("i = %d currentNode->eVal = %d\n", i, currentNode->eVal);
+                // printf("i = %d currentEVal = %d\n", i, currentEVal);
             }
             // printf("i = %d maxVal = %d\n", i, maxVal);
         }
@@ -99,7 +107,30 @@ int AlphaBetaPruing(game gB, std::vector<std::vector<int>> v, int alpha, int bet
     }
     else{
         int minVal = 1000000;
+        std::pair<int,int> arr[len]; // first val, second index
         for(int i=1; i<=len; i++){
+            if(i<=gB.getN()){ // choosePoint::ROW
+                int currentScore = gB.getCurrentRowOrColumnSum(choosePoint::ROW, i);
+                arr[i-1] = std::make_pair(currentScore, i);
+                if(currentScore == 0){
+                    continue;
+                }
+            }
+            else{ // choosePoint::COLUMN
+                int currentScore = gB.getCurrentRowOrColumnSum(choosePoint::COLUMN, i-gB.getN());
+                arr[i-1] = std::make_pair(currentScore, i);
+                if(currentScore == 0){
+                    continue;
+                }
+            }
+        }
+        std::sort(arr, arr+len, sortByFir);
+        // for(int i=1; i<=len; i++){
+        for(int j=1; j<=len; j++){
+            int i = arr[j-1].second;
+            if (i == 0){
+                continue;
+            }
             if(i<=gB.getN()){ // choosePoint::ROW
                 int currentScore = gB.getCurrentRowOrColumnSum(choosePoint::COLUMN, i-gB.getN());
                 if(currentScore == 0){
@@ -107,12 +138,12 @@ int AlphaBetaPruing(game gB, std::vector<std::vector<int>> v, int alpha, int bet
                 }
                 game tmpGB = gB;
                 tmpGB.getOneStepVal(choosePoint::ROW, i);
-                Node *currentNode = newNode(currentScore, 0);
-                currentNode->eVal = getEvalFunctionVal(currentNode, parentNode, isMax);
-                // printf("i = %d currentNode->eVal = %d depth = %d\n", i, currentNode->eVal, depth);
-                int val = AlphaBetaPruing(tmpGB, v, alpha, beta, false, depth+1, currentNode, currentPlayer);
-                minVal = std::min(minVal, currentNode->eVal);
-                beta = std::min(beta, currentNode->eVal);
+                
+                tmpGB.setplayer2Score(currentScore);
+                // printf("i = %d currentEVal = %d depth = %d\n", i, currentEVal, depth);
+                int val = AlphaBetaPruing(tmpGB, v, alpha, beta, true, depth-1, currentPlayer);
+                minVal = std::min(minVal, val);
+                beta = std::min(beta, minVal);
                 if(beta <= alpha){
                     // printf("min Prune\n");
                     break;
@@ -125,12 +156,12 @@ int AlphaBetaPruing(game gB, std::vector<std::vector<int>> v, int alpha, int bet
                 }
                 game tmpGB = gB;
                 tmpGB.getOneStepVal(choosePoint::COLUMN, i-gB.getN());
-                Node *currentNode = newNode(currentScore, 0);
-                currentNode->eVal = getEvalFunctionVal(currentNode, parentNode, isMax);
-                // printf("i = %d currentNode->eVal = %d depth = %d\n", i, currentNode->eVal, depth);
-                int val = AlphaBetaPruing(tmpGB, v, alpha, beta, false, depth+1, currentNode, currentPlayer);
-                minVal = std::min(minVal, currentNode->eVal);
-                beta = std::min(beta, currentNode->eVal);
+                
+                tmpGB.setplayer2Score(currentScore);
+                // printf("i = %d currentEVal = %d depth = %d\n", i, currentEVal, depth);
+                int val = AlphaBetaPruing(tmpGB, v, alpha, beta, true, depth-1, currentPlayer);
+                minVal = std::min(minVal, val);
+                beta = std::min(beta, minVal);
                 if(beta <= alpha){
                     // printf("min Prune\n");
                     break;
@@ -154,8 +185,7 @@ int main(void){
     int ansSelectPos = 1;
     while(!gB.isBoardClean()){ // play game until the board is clean
         selectPosI = 1;
-        Node* root = newNode(0, 0);
-        int val = AlphaBetaPruing(gB, v, -1000000, 1000000, true, 0, root, player);
+        int val = AlphaBetaPruing(gB, v, -1000000, 1000000, true, 16, player);
         // printf("ab prune ret val = %d\n", val);
         // printf("selectPosI = %d\n", selectPosI);
         // give the player score he/she choose

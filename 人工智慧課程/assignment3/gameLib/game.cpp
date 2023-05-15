@@ -110,3 +110,19 @@ void game::printPlayerScore(){
 void game::printFinalScore(){
     printf("%d points\n", player1Score - player2Score);
 }
+
+void game::setplayer1Score(int score){
+    player1Score = score;
+}
+
+void game::setplayer2Score(int score){
+    player2Score = score;
+}
+
+int game::getPlayer1Score() const{
+    return player1Score;
+}
+
+int game::getPlayer2Score() const{
+    return player2Score;
+}
