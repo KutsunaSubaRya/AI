@@ -30,8 +30,18 @@ void gameBoardUnit::initBoard(std::vector<std::vector<int>> board, int n, int m)
     }
 }
 
+bool gameBoardUnit::isBoardClean() const{
+    for(auto i : units_){
+        for(auto j:i){
+            if(j.getState() == state::BLACK){
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 void gameBoardUnit::printBoard() const{
-    printf("current board: \n");
     for(auto i : units_){
         for(auto j:i){
             if(j.getState() == state::CLEAN){

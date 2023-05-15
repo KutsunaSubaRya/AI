@@ -29,3 +29,7 @@ void printBoard(std::vector<std::vector<int>> v, int n, int m){
     }
     std::cout << std::endl;
 }
+
+void updatePlayerScore(game gB, int score, bool isMax){
+    gB.updatePlayerScore(score, isMax);
+}

@@ -25,6 +25,7 @@ class gameBoardUnit{
     public:
         friend class game;
         void initBoard(std::vector<std::vector<int>> board, int n, int m);
+        bool isBoardClean() const;
         void printBoard() const;
         
 };
