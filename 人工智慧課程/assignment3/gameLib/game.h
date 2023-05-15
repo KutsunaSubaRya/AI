@@ -24,8 +24,7 @@ class game{
         bool isBoardClean();
         void cleanRowOrColumnBoard(choosePoint cp, int pos);
         int getCurrentRowOrColumnSum(choosePoint cp, int pos);
-        int getOneStepVal(choosePoint cp, int pos);
-        void revertLastStepBoard();
+        void nextOneStep(choosePoint cp, int pos);
         int getN() const;
         int getM() const;
         int getRowOrColumnScore(choosePoint cp, int pos);

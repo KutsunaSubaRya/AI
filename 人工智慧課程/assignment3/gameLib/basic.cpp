@@ -1,7 +1,7 @@
 #include "basic.h"
 std::vector<std::vector<int>> initBoard(){
     // read file to string
-    std::ifstream inFile("./testcase/input1.txt");
+    std::ifstream inFile("./input.txt");
 
     // Read the first line with n and m
     int n, m;

@@ -8,8 +8,6 @@ void game::initBoard(std::vector<std::vector<int>> v, int n , int m){
 void game::printBoard(){
     printf("current board: \n");
     gB_.printBoard();
-    // printf("\nlast board: \n");
-    // lastStepUnit_.printBoard();
     printf("----------------------\n\n");
 }
 
@@ -51,18 +49,8 @@ int game::getCurrentRowOrColumnSum(choosePoint cp, int pos){
     return totalVal;
 }
 
-int game::getOneStepVal(choosePoint cp, int pos){
-    // be aware that pos must be original value - 1
-    int val = getCurrentRowOrColumnSum(cp, pos);
-    // store board to lastStepUnit
-    // printf("val= %d\n", val);
-    lastStepUnit_.units_ = gB_.units_;
+void game::nextOneStep(choosePoint cp, int pos){
     cleanRowOrColumnBoard(cp, pos);
-    return val;
-}
-
-void game::revertLastStepBoard(){
-    gB_.units_ = lastStepUnit_.units_;
 }
 
 int game::getN() const{
@@ -112,11 +100,11 @@ void game::printFinalScore(){
 }
 
 void game::setplayer1Score(int score){
-    player1Score = score;
+    player1Score += score;
 }
 
 void game::setplayer2Score(int score){
-    player2Score = score;
+    player2Score += score;
 }
 
 int game::getPlayer1Score() const{
