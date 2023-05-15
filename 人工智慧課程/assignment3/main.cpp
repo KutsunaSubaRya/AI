@@ -13,7 +13,6 @@ bool sortByFir(const std::pair<int,int> &a,const std::pair<int,int> &b){
     return (a.first > b.first);
 }
 
-// choosePoint::ROW and choosePoint::COLUMN are son of the node
 // in one choose, we need to choose one of the row or column point
 // use first person get score minus second person get score as evaluation function
 int AlphaBetaPruing(game gB, int alpha, int beta, bool isMax, int depth, bool currentPlayer) {
@@ -22,7 +21,7 @@ int AlphaBetaPruing(game gB, int alpha, int beta, bool isMax, int depth, bool cu
         return gB.getPlayer1Score() - gB.getPlayer2Score();
     }
     int len = gB.getN() + gB.getM();
-    if(isMax){
+    if(isMax){ // player 1's turn
         int maxVal = -1000000;
         std::pair<int,int> arr[len]; // first val, second index
         for(int i=1; i<=len; i++){
@@ -53,9 +52,9 @@ int AlphaBetaPruing(game gB, int alpha, int beta, bool isMax, int depth, bool cu
                     continue;
                 }
                 game nextGB = gB;
-                nextGB.nextOneStep(choosePoint::ROW, i);
+                nextGB.nextOneStep(choosePoint::ROW, i); // player 1's turn
                 nextGB.setplayer1Score(currentScore);
-                int val = AlphaBetaPruing(nextGB, alpha, beta, false, depth-1, currentPlayer);
+                int val = AlphaBetaPruing(nextGB, alpha, beta, false, depth-1, currentPlayer); // recursive and pass the updated the game board
                 if(val > maxVal){
                     maxVal = val;
                     if(depth == 16){
@@ -63,7 +62,7 @@ int AlphaBetaPruing(game gB, int alpha, int beta, bool isMax, int depth, bool cu
                     }
                 }
                 alpha = std::max(alpha, maxVal);
-                if(beta <= alpha){
+                if(beta <= alpha){ // if aplha >= beta, then prune
                     break;
                 }
             }
@@ -73,10 +72,10 @@ int AlphaBetaPruing(game gB, int alpha, int beta, bool isMax, int depth, bool cu
                     continue;
                 }
                 game nextGB = gB;
-                nextGB.nextOneStep(choosePoint::COLUMN, i-gB.getN());
+                nextGB.nextOneStep(choosePoint::COLUMN, i-gB.getN()); // player 1's turn
                 
                 nextGB.setplayer1Score(currentScore);
-                int val = AlphaBetaPruing(nextGB, alpha, beta, false, depth-1, currentPlayer);
+                int val = AlphaBetaPruing(nextGB, alpha, beta, false, depth-1, currentPlayer); // recursive and pass the updated the game board
                 if(val > maxVal){
                     maxVal = val;
                     if(depth == 16){
@@ -91,7 +90,7 @@ int AlphaBetaPruing(game gB, int alpha, int beta, bool isMax, int depth, bool cu
         }
         return maxVal;
     }
-    else{
+    else{ // player 2's turn
         int minVal = 1000000;
         std::pair<int,int> arr[len]; // first val, second index
         for(int i=1; i<=len; i++){
@@ -122,10 +121,10 @@ int AlphaBetaPruing(game gB, int alpha, int beta, bool isMax, int depth, bool cu
                     continue;
                 }
                 game nextGB = gB;
-                nextGB.nextOneStep(choosePoint::ROW, i);
+                nextGB.nextOneStep(choosePoint::ROW, i); // player 2's turn
                 
                 nextGB.setplayer2Score(currentScore);
-                int val = AlphaBetaPruing(nextGB, alpha, beta, true, depth-1, currentPlayer);
+                int val = AlphaBetaPruing(nextGB, alpha, beta, true, depth-1, currentPlayer); // recursive and pass the updated the game board
                 minVal = std::min(minVal, val);
                 beta = std::min(beta, minVal);
                 if(beta <= alpha){
@@ -138,13 +137,13 @@ int AlphaBetaPruing(game gB, int alpha, int beta, bool isMax, int depth, bool cu
                     continue;
                 }
                 game nextGB = gB;
-                nextGB.nextOneStep(choosePoint::COLUMN, i-gB.getN());
+                nextGB.nextOneStep(choosePoint::COLUMN, i-gB.getN()); // player 2's turn
                 
                 nextGB.setplayer2Score(currentScore);
-                int val = AlphaBetaPruing(nextGB, alpha, beta, true, depth-1, currentPlayer);
+                int val = AlphaBetaPruing(nextGB, alpha, beta, true, depth-1, currentPlayer); // recursive and pass the updated the game board
                 minVal = std::min(minVal, val);
                 beta = std::min(beta, minVal);
-                if(beta <= alpha){
+                if(beta <= alpha){ // if aplha >= beta, then prune
                     break;
                 }
             }
